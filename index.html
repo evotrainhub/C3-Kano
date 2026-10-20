@@ -1,0 +1,1319 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Simulator KANO - Managementul Calității în Sănătate</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
+    .fade-in { animation: fadeIn 0.25s ease-in-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen pb-16">
+
+  <!-- HEADER FIX -->
+  <header class="bg-blue-900 text-white sticky top-0 z-30 shadow-md">
+    <div class="max-w-xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div>
+        <span class="text-xs uppercase tracking-wider text-blue-300 font-semibold block">Masterat • Managementul Calității</span>
+        <h1 class="text-lg font-bold leading-tight">Studiu de Caz: Modelul KANO</h1>
+      </div>
+      <button type="button" onclick="toggleCheatSheet()" class="bg-amber-500 hover:bg-amber-400 text-slate-900 font-bold text-xs px-3 py-2 rounded-lg shadow flex items-center gap-1 transition cursor-pointer">
+        <span>📖</span> Tabele & Formule
+      </button>
+    </div>
+  </header>
+
+  <!-- CONTAINER PRINCIPAL -->
+  <main class="max-w-xl mx-auto px-4 pt-4">
+
+    <!-- ECRAN 0: ALEGEREA ECHIPEI (SCRIS DIRECT ÎN HTML CA SĂ APARĂ GARANTAT) -->
+    <section id="screen-select" class="fade-in">
+      <div class="bg-white rounded-2xl shadow-sm p-5 border border-slate-200 mb-5">
+        <span class="inline-block bg-blue-100 text-blue-800 text-xs font-bold px-2.5 py-1 rounded-full mb-2">Scenariu Decizional • 35 min</span>
+        <h2 class="text-xl font-bold text-slate-900 mb-2">Spitalul Județean în Criză: Bugetul de 50.000 €</h2>
+        <p class="text-sm text-slate-600 leading-relaxed mb-3">
+          Spitalul nostru se confruntă cu un val de reclamații, iar Consiliul de Administrație a deblocat un fond de urgență de <strong>50.000 € per secție</strong> pentru creșterea satisfacției pacienților.
+        </p>
+        <p class="text-sm text-slate-600 leading-relaxed">
+          Fiecare echipă conduce o secție diferită. Va trebui să interpretați chestionarele KANO aplicate pe <strong>100 de pacienți</strong>, să calculați coeficienții <strong>CS, CI și w<sub>i</sub></strong> și să decideți în ce investiți banii fără să cădeți în <em>„Capcana percepției”</em>!
+        </p>
+      </div>
+
+      <h3 class="text-sm font-bold uppercase tracking-wider text-slate-500 mb-3 px-1">Alegeți echipa voastră:</h3>
+      
+      <div class="grid grid-cols-1 gap-3" id="team-cards">
+        <!-- Echipa 1 -->
+        <button type="button" onclick="selectTeam(1)" class="w-full bg-white hover:bg-blue-50 border-2 border-slate-200 hover:border-blue-600 rounded-2xl p-4 text-left shadow-sm transition flex items-center justify-between group cursor-pointer">
+          <div class="pr-3">
+            <span class="inline-block text-xs font-extrabold px-2 py-0.5 rounded bg-blue-100 text-blue-800 mb-1">Echipa 1 • UPU</span>
+            <h4 class="font-bold text-slate-900 text-base group-hover:text-blue-900">Unitatea de Primiri Urgențe (UPU)</h4>
+            <p class="text-xs text-slate-500 mt-0.5">Pacienți în stare acută, stres maxim, timp de așteptare critic</p>
+          </div>
+          <span class="text-blue-700 font-bold text-xl">→</span>
+        </button>
+
+        <!-- Echipa 2 -->
+        <button type="button" onclick="selectTeam(2)" class="w-full bg-white hover:bg-blue-50 border-2 border-slate-200 hover:border-blue-600 rounded-2xl p-4 text-left shadow-sm transition flex items-center justify-between group cursor-pointer">
+          <div class="pr-3">
+            <span class="inline-block text-xs font-extrabold px-2 py-0.5 rounded bg-pink-100 text-pink-800 mb-1">Echipa 2 • Maternitate</span>
+            <h4 class="font-bold text-slate-900 text-base group-hover:text-blue-900">Maternitate & Neonatologie</h4>
+            <p class="text-xs text-slate-500 mt-0.5">Paciente care caută siguranță, empatie, intimitate și confort emoțional</p>
+          </div>
+          <span class="text-blue-700 font-bold text-xl">→</span>
+        </button>
+
+        <!-- Echipa 3 -->
+        <button type="button" onclick="selectTeam(3)" class="w-full bg-white hover:bg-blue-50 border-2 border-slate-200 hover:border-blue-600 rounded-2xl p-4 text-left shadow-sm transition flex items-center justify-between group cursor-pointer">
+          <div class="pr-3">
+            <span class="inline-block text-xs font-extrabold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 mb-1">Echipa 3 • Ambulatoriu</span>
+            <h4 class="font-bold text-slate-900 text-base group-hover:text-blue-900">Ambulatoriu Integrat (Policlinică)</h4>
+            <p class="text-xs text-slate-500 mt-0.5">Pacienți activi, consultații pe bază de programare și analize de laborator</p>
+          </div>
+          <span class="text-blue-700 font-bold text-xl">→</span>
+        </button>
+
+        <!-- Echipa 4 -->
+        <button type="button" onclick="selectTeam(4)" class="w-full bg-white hover:bg-blue-50 border-2 border-slate-200 hover:border-blue-600 rounded-2xl p-4 text-left shadow-sm transition flex items-center justify-between group cursor-pointer">
+          <div class="pr-3">
+            <span class="inline-block text-xs font-extrabold px-2 py-0.5 rounded bg-amber-100 text-amber-800 mb-1">Echipa 4 • Boli Cronice</span>
+            <h4 class="font-bold text-slate-900 text-base group-hover:text-blue-900">Secția Boli Cronice & Recuperare</h4>
+            <p class="text-xs text-slate-500 mt-0.5">Spitalizare prelungită (7-14 zile), pacienți vârstnici, accent pe îngrijire și empatie</p>
+          </div>
+          <span class="text-blue-700 font-bold text-xl">→</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- ECRAN 0.5: ÎNREGISTRAREA MEMBRILOR ECHIPEI -->
+    <section id="screen-members" class="hidden fade-in">
+      <div class="bg-white rounded-2xl shadow-sm p-5 border border-slate-200 mb-4">
+        <div class="flex items-center justify-between mb-3">
+          <span id="reg-team-badge" class="text-xs font-extrabold px-2.5 py-1 rounded bg-blue-100 text-blue-800"></span>
+          <button type="button" onclick="resetToTeamSelect()" class="text-xs text-slate-500 underline hover:text-slate-800 cursor-pointer">← Înapoi la secții</button>
+        </div>
+        <h2 id="reg-team-title" class="text-lg font-bold text-slate-900 mb-1"></h2>
+        <p class="text-xs text-slate-600 mb-4">
+          Introduceți numele membrilor echipei (4–6 studenți). Aceste nume vor apărea pe <strong>Raportul PDF final</strong> pe care îl veți descărca și încărca pe platformă.
+        </p>
+
+        <div id="members-inputs" class="space-y-2.5 mb-3">
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-bold text-slate-500 w-6">1.</span>
+            <input type="text" placeholder="Nume și Prenume student 1 (obligatoriu)" class="member-input w-full text-sm p-2.5 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600">
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-bold text-slate-500 w-6">2.</span>
+            <input type="text" placeholder="Nume și Prenume student 2" class="member-input w-full text-sm p-2.5 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600">
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-bold text-slate-500 w-6">3.</span>
+            <input type="text" placeholder="Nume și Prenume student 3" class="member-input w-full text-sm p-2.5 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600">
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-bold text-slate-500 w-6">4.</span>
+            <input type="text" placeholder="Nume și Prenume student 4" class="member-input w-full text-sm p-2.5 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600">
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-bold text-slate-500 w-6">5.</span>
+            <input type="text" placeholder="Nume și Prenume student 5 (opțional)" class="member-input w-full text-sm p-2.5 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600">
+          </div>
+        </div>
+
+        <button type="button" onclick="addMemberField()" class="text-xs font-bold text-blue-700 hover:text-blue-900 mb-4 inline-flex items-center gap-1 cursor-pointer">
+          + Adaugă încă un membru în echipă
+        </button>
+
+        <button type="button" onclick="confirmTeamMembers()" class="w-full bg-blue-800 hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl shadow transition cursor-pointer">
+          Începe Studiul de Caz →
+        </button>
+      </div>
+    </section>
+
+    <!-- ECRANUL DE LUCRU AL ECHIPEI -->
+    <section id="screen-workspace" class="hidden fade-in">
+      <!-- Bara Echipa + Schimbare -->
+      <div class="bg-white rounded-xl p-3.5 shadow-sm border border-slate-200 mb-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <span id="team-badge" class="text-xs font-bold px-2 py-0.5 rounded bg-blue-100 text-blue-800"></span>
+            <h2 id="team-title" class="text-base font-bold text-slate-900 mt-0.5"></h2>
+          </div>
+          <button type="button" onclick="editTeamMembers()" class="text-xs text-blue-700 font-semibold underline hover:text-blue-900 cursor-pointer">✏️ Membri / Secție</button>
+        </div>
+        <p id="team-members-display" class="text-xs text-slate-500 mt-1.5 pt-1.5 border-t border-slate-100"></p>
+      </div>
+
+      <!-- Stepper Navigare Etape -->
+      <div class="grid grid-cols-3 gap-2 mb-4">
+        <button type="button" id="tab-btn-1" onclick="goToStep(1)" class="py-2 px-2 rounded-lg text-xs font-bold border text-center transition cursor-pointer">
+          1. Tabelul Kano
+        </button>
+        <button type="button" id="tab-btn-2" onclick="goToStep(2)" class="py-2 px-2 rounded-lg text-xs font-bold border text-center transition" disabled>
+          2. Calcul CS & CI
+        </button>
+        <button type="button" id="tab-btn-3" onclick="goToStep(3)" class="py-2 px-2 rounded-lg text-xs font-bold border text-center transition" disabled>
+          3. Buget & Decizie
+        </button>
+      </div>
+
+      <!-- ETAPA 1: DECODAREA TABELULUI KANO -->
+      <div id="step-1" class="space-y-4">
+        <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 text-sm text-blue-900">
+          <p class="font-bold mb-1">🎯 Misiunea Etapei 1 (10 min):</p>
+          <p id="team-context-desc" class="text-xs leading-relaxed mb-2"></p>
+          <p class="text-xs leading-relaxed">
+            Înainte de centralizarea datelor, aveți mai jos <strong>4 fișe individuale de pacienți</strong>. Folosiți <strong>Tabelul de evaluare Kano</strong> (butonul galben <em>„📖 Tabele & Formule”</em> de sus) pentru a încadra răspunsul fiecărui pacient în <strong>M, P, A, I, R</strong> sau <strong>Q</strong>.
+          </p>
+        </div>
+
+        <div id="step1-questions" class="space-y-3"></div>
+
+        <div id="step1-feedback" class="hidden rounded-xl p-3 text-sm font-medium"></div>
+
+        <button type="button" onclick="validateStep1()" class="w-full bg-blue-800 hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl shadow transition cursor-pointer">
+          Verifică încadrările și treci la Etapa 2 →
+        </button>
+      </div>
+
+      <!-- ETAPA 2: CALCULUL CS, CI SI Wi -->
+      <div id="step-2" class="hidden space-y-4">
+        <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 text-sm text-blue-900">
+          <p class="font-bold mb-1">📊 Misiunea Etapei 2 (15 min):</p>
+          <p class="text-xs leading-relaxed mb-2">
+            Ați centralizat răspunsurile a <strong>100 de pacienți</strong> pentru 5 inițiative propuse în secția voastră. Pentru primele 3 inițiative am calculat deja indicatorii, dar <strong>pentru ultimele 2 inițiative trebuie să calculați voi</strong>:
+          </p>
+          <ul class="text-xs space-y-1 bg-white/80 p-2.5 rounded-lg border border-blue-100 font-mono">
+            <li>• <strong>CS</strong> = (A + P) / (M + P + A + I)</li>
+            <li>• <strong>CI</strong> = (M + P) / (M + P + A + I)</li>
+            <li>• <strong>w<sub>i</sub></strong> = max(CS, CI)</li>
+          </ul>
+          <p class="text-[11px] text-blue-700 mt-2">
+            *Notă: Răspunsurile <strong>R</strong> și <strong>Q</strong> nu intră în numitorul (M+P+A+I). Scrieți valorile cu 2 zecimale (ex: <strong>0.75</strong> sau <strong>0,75</strong>).
+          </p>
+        </div>
+
+        <div id="step2-items" class="space-y-4"></div>
+
+        <div id="step2-feedback" class="hidden rounded-xl p-3 text-sm font-medium"></div>
+
+        <button type="button" onclick="validateStep2()" class="w-full bg-blue-800 hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl shadow transition cursor-pointer">
+          Verifică calculele și generează Matricea →
+        </button>
+      </div>
+
+      <!-- ETAPA 3: MATRICEA SI ALOCAREA BUGETULUI -->
+      <div id="step-3" class="hidden space-y-4">
+        <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200">
+          <h3 class="font-bold text-slate-900 text-base mb-1">1. Matricea KANO: Importanță (CI) vs. Satisfacție (CS)</h3>
+          <p class="text-xs text-slate-500 mb-3">
+            Pe baza coeficienților calculați la pasul anterior, iată unde se plasează cele 5 caracteristici ale secției voastre:
+          </p>
+
+          <!-- Grafic 2x2 Cadrane -->
+          <div class="relative w-full max-w-xs mx-auto aspect-square border-2 border-slate-700 bg-slate-50 rounded-lg overflow-hidden">
+            <div class="absolute inset-y-0 left-1/2 border-l-2 border-dashed border-slate-400"></div>
+            <div class="absolute inset-x-0 top-1/2 border-t-2 border-dashed border-slate-400"></div>
+
+            <span class="absolute top-2 left-2 text-[11px] font-bold text-purple-700 bg-purple-100/90 px-1.5 py-0.5 rounded">Atractiv (A)</span>
+            <span class="absolute top-2 right-2 text-[11px] font-bold text-emerald-700 bg-emerald-100/90 px-1.5 py-0.5 rounded">Performanță (P)</span>
+            <span class="absolute bottom-2 left-2 text-[11px] font-bold text-amber-700 bg-amber-100/90 px-1.5 py-0.5 rounded">Indiferent (I)</span>
+            <span class="absolute bottom-2 right-2 text-[11px] font-bold text-blue-700 bg-blue-100/90 px-1.5 py-0.5 rounded">De bază (M)</span>
+
+            <div id="matrix-points" class="absolute inset-0"></div>
+          </div>
+          <div class="flex justify-between text-[11px] text-slate-500 max-w-xs mx-auto mt-1 font-semibold">
+            <span>0.0 ← Importanță percepută (CI) → 1.0</span>
+          </div>
+          <div class="text-center text-[11px] text-slate-500 font-semibold mt-0.5">
+            Axa verticală (↑): Satisfacție percepută (CS: 0.0 jos → 1.0 sus)
+          </div>
+        </div>
+
+        <!-- Alocare Buget -->
+        <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200">
+          <div class="flex items-center justify-between mb-2">
+            <h3 class="font-bold text-slate-900 text-base">2. Alocarea Bugetului Secției</h3>
+            <span id="budget-counter" class="text-xs font-extrabold px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800">
+              0 / 50.000 €
+            </span>
+          </div>
+          <p class="text-xs text-slate-600 mb-3">
+            Selectați inițiativele pe care le finanțați în acest trimestru. <strong>Nu puteți depăși 50.000 €!</strong> Folosiți prioritizarea Kano (<strong>M &gt; P &gt; A &gt; I</strong> și greutatea <strong>w<sub>i</sub></strong>) pentru a maximiza impactul.
+          </p>
+
+          <div id="budget-list" class="space-y-2.5 mb-4"></div>
+
+          <label class="block text-xs font-bold text-slate-700 mb-1">
+            3. Argumentul echipei pentru prezentarea finală (1-2 fraze):
+          </label>
+          <textarea id="team-justification" rows="2" placeholder="De ce ați tăiat celelalte inițiative? Ce risc ați evitat?" class="w-full text-sm p-2.5 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600 mb-3"></textarea>
+
+          <button type="button" onclick="evaluateFinalDecision()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3.5 rounded-xl shadow transition cursor-pointer">
+            Generează Raportul & Scorul Echipei 🏆
+          </button>
+        </div>
+
+        <!-- Raport Final / Debriefing -->
+        <div id="final-report" class="hidden rounded-2xl p-5 shadow-md border-2 fade-in"></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- MODAL: TABELE SI FORMULE DIN CURS -->
+  <div id="modal-cheatsheet" class="fixed inset-0 bg-slate-900/70 z-50 hidden flex items-center justify-center p-3">
+    <div class="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto p-4 shadow-xl">
+      <div class="flex items-center justify-between border-b pb-2.5 mb-3">
+        <h3 class="font-bold text-slate-900 text-base">📖 Tabele & Formule KANO (Curs 3)</h3>
+        <button type="button" onclick="toggleCheatSheet()" class="text-slate-500 hover:text-slate-900 font-bold text-lg px-2 cursor-pointer">✕</button>
+      </div>
+
+      <div class="space-y-4 text-xs">
+        <div>
+          <h4 class="font-bold text-blue-900 mb-1">1. Tabelul de evaluare Kano</h4>
+          <p class="text-slate-600 mb-2">Încrucișați răspunsul de la întrebarea <strong>Funcțională (Y - rânduri)</strong> cu cel de la întrebarea <strong>Disfuncțională (X - coloane)</strong>:</p>
+          <div class="overflow-x-auto">
+            <table class="w-full border-collapse text-center text-[11px]">
+              <thead>
+                <tr class="bg-slate-800 text-white">
+                  <th class="border p-1.5 text-left">Funcțional (Y) \ Disfuncțional (X)</th>
+                  <th class="border p-1">Îmi place</th>
+                  <th class="border p-1">Mă aștept</th>
+                  <th class="border p-1">Indiferent</th>
+                  <th class="border p-1">Acceptabil</th>
+                  <th class="border p-1">Nu-mi place</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="border p-1.5 font-bold bg-slate-100 text-left">Îmi place</td>
+                  <td class="border p-1 font-bold text-slate-500">Q</td>
+                  <td class="border p-1 font-bold text-purple-700 bg-purple-50">A</td>
+                  <td class="border p-1 font-bold text-purple-700 bg-purple-50">A</td>
+                  <td class="border p-1 font-bold text-purple-700 bg-purple-50">A</td>
+                  <td class="border p-1 font-bold text-emerald-700 bg-emerald-50">P</td>
+                </tr>
+                <tr>
+                  <td class="border p-1.5 font-bold bg-slate-100 text-left">Mă aștept la asta</td>
+                  <td class="border p-1 font-bold text-rose-700 bg-rose-50">R</td>
+                  <td class="border p-1 font-bold text-slate-500">Q</td>
+                  <td class="border p-1 font-bold text-amber-700 bg-amber-50">I</td>
+                  <td class="border p-1 font-bold text-amber-700 bg-amber-50">I</td>
+                  <td class="border p-1 font-bold text-blue-700 bg-blue-50">M</td>
+                </tr>
+                <tr>
+                  <td class="border p-1.5 font-bold bg-slate-100 text-left">Indiferent / Nu-mi pasă</td>
+                  <td class="border p-1 font-bold text-rose-700 bg-rose-50">R</td>
+                  <td class="border p-1 font-bold text-amber-700 bg-amber-50">I</td>
+                  <td class="border p-1 font-bold text-amber-700 bg-amber-50">I</td>
+                  <td class="border p-1 font-bold text-amber-700 bg-amber-50">I</td>
+                  <td class="border p-1 font-bold text-blue-700 bg-blue-50">M</td>
+                </tr>
+                <tr>
+                  <td class="border p-1.5 font-bold bg-slate-100 text-left">Acceptabil</td>
+                  <td class="border p-1 font-bold text-rose-700 bg-rose-50">R</td>
+                  <td class="border p-1 font-bold text-amber-700 bg-amber-50">I</td>
+                  <td class="border p-1 font-bold text-amber-700 bg-amber-50">I</td>
+                  <td class="border p-1 font-bold text-slate-500">Q</td>
+                  <td class="border p-1 font-bold text-blue-700 bg-blue-50">M</td>
+                </tr>
+                <tr>
+                  <td class="border p-1.5 font-bold bg-slate-100 text-left">Nu-mi place</td>
+                  <td class="border p-1 font-bold text-rose-700 bg-rose-50">R</td>
+                  <td class="border p-1 font-bold text-rose-700 bg-rose-50">R</td>
+                  <td class="border p-1 font-bold text-rose-700 bg-rose-50">R</td>
+                  <td class="border p-1 font-bold text-rose-700 bg-rose-50">R</td>
+                  <td class="border p-1 font-bold text-slate-500">Q</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
+          <h4 class="font-bold text-blue-900 mb-1">2. Semnificația codurilor</h4>
+          <ul class="space-y-1 text-slate-700">
+            <li><strong class="text-blue-700">M (Must-Be / De bază):</strong> Obligatorii. Lipsa lor produce nemulțumire majoră, prezența lor e considerată normală.</li>
+            <li><strong class="text-emerald-700">P (Performance / Performanță):</strong> Cresc satisfacția liniar (cu cât mai rapid/mai bine, cu atât mai mulțumit e pacientul).</li>
+            <li><strong class="text-purple-700">A (Attractive / Entuziaste):</strong> Factor surpriză! Încântă pacientul dacă există, dar lipsa lor nu nemulțumește.</li>
+            <li><strong class="text-amber-700">I (Indifferent / Indiferente):</strong> Nu influențează satisfacția.</li>
+            <li><strong class="text-rose-700">R (Reverse / Reversibile):</strong> Prezența lor scade satisfacția (pacientul își dorește opusul).</li>
+            <li><strong class="text-slate-600">Q (Questionable / Îndoielnice):</strong> Răspuns contradictoriu.</li>
+          </ul>
+        </div>
+
+        <div class="bg-blue-50 p-3 rounded-xl border border-blue-200">
+          <h4 class="font-bold text-blue-900 mb-1">3. Formule Coeficienți KANO</h4>
+          <p class="font-mono text-xs mb-1"><strong>CS (Satisfacție)</strong> = (A + P) / (M + P + A + I)</p>
+          <p class="font-mono text-xs mb-1"><strong>CI (Insatisfacție / Importanță)</strong> = (M + P) / (M + P + A + I)</p>
+          <p class="font-mono text-xs"><strong>Greutatea absolută w<sub>i</sub></strong> = max(CS, CI)</p>
+        </div>
+      </div>
+
+      <button type="button" onclick="toggleCheatSheet()" class="mt-4 w-full bg-slate-800 text-white font-bold py-2.5 rounded-xl cursor-pointer">Închide</button>
+    </div>
+  </div>
+
+  <script>
+    const TEAMS_DATA = [
+      {
+        id: 1,
+        badge: "Echipa 1 • UPU",
+        name: "Unitatea de Primiri Urgențe (UPU)",
+        subtitle: "Pacienți în stare acută, stres maxim, timp de așteptare critic",
+        context: "Secția UPU are cel mai mic scor de satisfacție din spital. Aparținătorii reclamă lipsa de comunicare și timpii mari de așteptare, în timp ce conducerea vrea să cumpere ecrane TV și plante ornamentale.",
+        step1Cases: [
+          {
+            feature: "Respectarea igienei și dezinfectarea tărgilor între pacienți",
+            func: "Mă aștept la asta",
+            dysf: "Nu-mi place",
+            correct: "M"
+          },
+          {
+            feature: "Primirea rezultatelor la analizele de urgență în mai puțin de 30 minute",
+            func: "Îmi place",
+            dysf: "Nu-mi place",
+            correct: "P"
+          },
+          {
+            feature: "Panou digital în sala de așteptare cu timpul estimat până la preluare și statusul pacientului (în investigații / la CT)",
+            func: "Îmi place",
+            dysf: "Acceptabil",
+            correct: "A"
+          },
+          {
+            feature: "Înlocuirea asistentului de la recepție cu un robot vocal automat pentru preluarea datelor la intrarea în UPU",
+            func: "Nu-mi place",
+            dysf: "Îmi place",
+            correct: "R"
+          }
+        ],
+        features: [
+          {
+            id: "u1",
+            name: "1. Igienă impecabilă și grupuri sanitare dezinfectate în UPU",
+            cost: 15000,
+            counts: { M: 68, P: 12, A: 4, I: 16, R: 0, Q: 0 },
+            prefilled: true
+          },
+          {
+            id: "u2",
+            name: "2. Afișaj electronic în timp real cu stadiul investigațiilor pacientului",
+            cost: 15000,
+            counts: { M: 8, P: 18, A: 54, I: 20, R: 0, Q: 0 },
+            prefilled: true
+          },
+          {
+            id: "u3",
+            name: "3. Reviste glossy și plante ornamentale în zona de triaj",
+            cost: 10000,
+            counts: { M: 2, P: 4, A: 14, I: 75, R: 3, Q: 2 },
+            prefilled: true
+          },
+          {
+            id: "u4",
+            name: "4. Linie rapidă (Fast-Track) pentru analize și radiografii (<30 min)",
+            cost: 20000,
+            counts: { M: 20, P: 55, A: 15, I: 10, R: 0, Q: 0 },
+            prefilled: false
+          },
+          {
+            id: "u5",
+            name: "5. Asistent dedicat comunicării empatice cu familia în sala de așteptare",
+            cost: 20000,
+            counts: { M: 52, P: 23, A: 10, I: 15, R: 0, Q: 0 },
+            prefilled: false
+          }
+        ]
+      },
+      {
+        id: 2,
+        badge: "Echipa 2 • Maternitate",
+        name: "Maternitate & Neonatologie",
+        subtitle: "Paciente care caută siguranță, empatie, intimitate și confort emoțional",
+        context: "Maternitatea spitalului pierde paciente în favoarea clinicilor private. Viitoarele mame se plâng de atitudinea rece a personalului și de lipsa condițiilor de bază din saloane.",
+        step1Cases: [
+          {
+            feature: "Asistentele și moașele vă tratează cu respect, calm și empatie",
+            func: "Mă aștept la asta",
+            dysf: "Nu-mi place",
+            correct: "M"
+          },
+          {
+            feature: "Sesiune gratuită de consiliere în alăptare și fotografie profesională a nou-născutului la externare",
+            func: "Îmi place",
+            dysf: "Indiferent",
+            correct: "A"
+          },
+          {
+            feature: "Salon cu cel mult 2 paturi și grup sanitar propriu impecabil",
+            func: "Îmi place",
+            dysf: "Nu-mi place",
+            correct: "P"
+          },
+          {
+            feature: "Program fix de vizită de 3 ore în care toți aparținătorii intră simultan în salonul comun",
+            func: "Nu-mi place",
+            dysf: "Mă aștept la asta",
+            correct: "R"
+          }
+        ],
+        features: [
+          {
+            id: "m1",
+            name: "1. Buton de panică funcțional la fiecare pat și curățenie strictă în băi",
+            cost: 15000,
+            counts: { M: 72, P: 14, A: 4, I: 10, R: 0, Q: 0 },
+            prefilled: true
+          },
+          {
+            id: "m2",
+            name: "2. Kit cadou pentru bebeluș și consultant de lactație la pat",
+            cost: 15000,
+            counts: { M: 6, P: 19, A: 55, I: 20, R: 0, Q: 0 },
+            prefilled: true
+          },
+          {
+            id: "m3",
+            name: "3. Ecran TV cu canal intern de știri medicale pe holul secției",
+            cost: 10000,
+            counts: { M: 4, P: 6, A: 10, I: 70, R: 6, Q: 4 },
+            prefilled: true
+          },
+          {
+            id: "m4",
+            name: "4. Training și protocol de comunicare empatică pentru moașe și asistente",
+            cost: 15000,
+            counts: { M: 56, P: 24, A: 10, I: 10, R: 0, Q: 0 },
+            prefilled: false
+          },
+          {
+            id: "m5",
+            name: "5. Recompartimentare saloane (intimitate mamă-copil și control temperatură)",
+            cost: 20000,
+            counts: { M: 18, P: 54, A: 18, I: 10, R: 0, Q: 0 },
+            prefilled: false
+          }
+        ]
+      },
+      {
+        id: 3,
+        badge: "Echipa 3 • Ambulatoriu",
+        name: "Ambulatoriu Integrat (Policlinică)",
+        subtitle: "Pacienți activi, consultații pe bază de programare și analize de laborator",
+        context: "În Policlinică, pacienții stau la cozi chiar și când au programare, locurile de parcare sunt insuficiente, iar rezultatele la analize se eliberează doar pe hârtie la ghișeu.",
+        step1Cases: [
+          {
+            feature: "Respectarea orei de programare (decalaj de maximum 10 minute)",
+            func: "Îmi place",
+            dysf: "Nu-mi place",
+            correct: "P"
+          },
+          {
+            feature: "Existența locurilor de parcare dedicate pacienților în curtea spitalului",
+            func: "Îmi place",
+            dysf: "Acceptabil",
+            correct: "A"
+          },
+          {
+            feature: "Existența săpunului, hârtiei și curățeniei în toaletele din policlinică",
+            func: "Acceptabil",
+            dysf: "Nu-mi place",
+            correct: "M"
+          },
+          {
+            feature: "Pacientul bifează atât că îi place prezența echipamentelor moderne, cât și că îi place absența lor",
+            func: "Îmi place",
+            dysf: "Îmi place",
+            correct: "Q"
+          }
+        ],
+        features: [
+          {
+            id: "a1",
+            name: "1. Sterilizare vizibilă a instrumentarului și igienă în cabinete",
+            cost: 15000,
+            counts: { M: 70, P: 15, A: 5, I: 10, R: 0, Q: 0 },
+            prefilled: true
+          },
+          {
+            id: "a2",
+            name: "2. SMS automat de reamintire + hartă digitală de orientare spre cabinet",
+            cost: 10000,
+            counts: { M: 5, P: 20, A: 53, I: 22, R: 0, Q: 0 },
+            prefilled: true
+          },
+          {
+            id: "a3",
+            name: "3. Muzică clasică ambientală în difuzoarele din holul policlinicii",
+            cost: 10000,
+            counts: { M: 2, P: 6, A: 12, I: 60, R: 15, Q: 5 },
+            prefilled: true
+          },
+          {
+            id: "a4",
+            name: "4. Sistem de programări decalate și eliberare rapidă a analizelor online",
+            cost: 20000,
+            counts: { M: 22, P: 56, A: 12, I: 10, R: 0, Q: 0 },
+            prefilled: false
+          },
+          {
+            id: "a5",
+            name: "5. Amenajare 30 locuri de parcare cu barieră pentru pacienți",
+            cost: 25000,
+            counts: { M: 14, P: 48, A: 22, I: 16, R: 0, Q: 0 },
+            prefilled: false
+          }
+        ]
+      },
+      {
+        id: 4,
+        badge: "Echipa 4 • Boli Cronice",
+        name: "Secția Boli Cronice & Recuperare",
+        subtitle: "Spitalizare prelungită (7-14 zile), pacienți vârstnici, accent pe îngrijire și empatie",
+        context: "Pacienții internați pe termen lung se plâng de mâncarea rece, saltelele uzate și faptul că medicii vorbesc în termeni prea tehnici. Departamentul IT propune însă o aplicație VR.",
+        step1Cases: [
+          {
+            feature: "Medicul empatizează cu dvs. și vă explică tratamentul pe înțelesul dvs.",
+            func: "Mă aștept la asta",
+            dysf: "Nu-mi place",
+            correct: "M"
+          },
+          {
+            feature: "Existența unei grădini interioare amenajate pentru plimbare și kinetoterapie",
+            func: "Îmi place",
+            dysf: "Indiferent",
+            correct: "A"
+          },
+          {
+            feature: "Calitatea hranei calde și posibilitatea de a alege dintre 2 meniuri adaptate dietei",
+            func: "Îmi place",
+            dysf: "Nu-mi place",
+            correct: "P"
+          },
+          {
+            feature: "Eliminarea vizitei medicale de dimineață și înlocuirea ei cu mesaje pe o tabletă la pat",
+            func: "Nu-mi place",
+            dysf: "Îmi place",
+            correct: "R"
+          }
+        ],
+        features: [
+          {
+            id: "c1",
+            name: "1. Saltele antiescară, lenjerie curată și administrarea la timp a medicației",
+            cost: 20000,
+            counts: { M: 66, P: 16, A: 6, I: 12, R: 0, Q: 0 },
+            prefilled: true
+          },
+          {
+            id: "c2",
+            name: "2. Club de socializare și bibliotecă mobilă cu cărți/audiobook-uri",
+            cost: 10000,
+            counts: { M: 6, P: 16, A: 52, I: 26, R: 0, Q: 0 },
+            prefilled: true
+          },
+          {
+            id: "c3",
+            name: "3. Aplicație mobilă de realitate virtuală (VR) pentru pacienții vârstnici",
+            cost: 15000,
+            counts: { M: 2, P: 3, A: 10, I: 65, R: 15, Q: 5 },
+            prefilled: true
+          },
+          {
+            id: "c4",
+            name: "4. Timp dedicat medic-pacient (15 min/zi explicații empatice despre evoluție)",
+            cost: 15000,
+            counts: { M: 54, P: 26, A: 10, I: 10, R: 0, Q: 0 },
+            prefilled: false
+          },
+          {
+            id: "c5",
+            name: "5. Serviciu de catering spitalicesc cald (2 opțiuni de meniu la alegere)",
+            cost: 15000,
+            counts: { M: 20, P: 52, A: 16, I: 12, R: 0, Q: 0 },
+            prefilled: false
+          }
+        ]
+      }
+    ];
+
+    let currentTeam = null;
+    let currentStep = 1;
+    let unlockedStep = 1;
+    let selectedBudgetIds = new Set();
+    let teamMembers = [];
+    let lastEvaluation = null;
+
+    function computeKanoMetrics(counts) {
+      const denom = counts.M + counts.P + counts.A + counts.I;
+      const cs = (counts.A + counts.P) / denom;
+      const ci = (counts.M + counts.P) / denom;
+      const wi = Math.max(cs, ci);
+      let maxCat = "M";
+      let maxVal = -1;
+      for (const k of ["M", "P", "A", "I", "R", "Q"]) {
+        if (counts[k] > maxVal) {
+          maxVal = counts[k];
+          maxCat = k;
+        }
+      }
+      return {
+        denom,
+        cs: Number(cs.toFixed(2)),
+        ci: Number(ci.toFixed(2)),
+        wi: Number(wi.toFixed(2)),
+        cat: maxCat
+      };
+    }
+
+    function selectTeam(teamId) {
+      currentTeam = TEAMS_DATA.find(t => t.id === teamId);
+      if (!currentTeam) return;
+
+      document.getElementById("screen-select").classList.add("hidden");
+      document.getElementById("screen-workspace").classList.add("hidden");
+      document.getElementById("screen-members").classList.remove("hidden");
+
+      document.getElementById("reg-team-badge").textContent = currentTeam.badge;
+      document.getElementById("reg-team-title").textContent = currentTeam.name;
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function addMemberField() {
+      const container = document.getElementById("members-inputs");
+      const count = container.querySelectorAll(".member-input").length + 1;
+      const div = document.createElement("div");
+      div.className = "flex items-center gap-2";
+      div.innerHTML = `
+        <span class="text-xs font-bold text-slate-500 w-6">${count}.</span>
+        <input type="text" placeholder="Nume și Prenume student ${count}" class="member-input w-full text-sm p-2.5 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600">
+      `;
+      container.appendChild(div);
+    }
+
+    function confirmTeamMembers() {
+      const inputs = document.querySelectorAll(".member-input");
+      const names = [];
+      inputs.forEach(inp => {
+        const val = inp.value.trim();
+        if (val) names.push(val);
+      });
+
+      if (names.length === 0) {
+        alert("Introduceți numele a cel puțin unui membru al echipei pentru a putea genera raportul PDF la final!");
+        return;
+      }
+
+      teamMembers = names;
+      currentStep = 1;
+      unlockedStep = 1;
+      selectedBudgetIds.clear();
+
+      document.getElementById("screen-members").classList.add("hidden");
+      document.getElementById("screen-workspace").classList.remove("hidden");
+
+      document.getElementById("team-badge").textContent = currentTeam.badge;
+      document.getElementById("team-title").textContent = currentTeam.name;
+      document.getElementById("team-members-display").innerHTML = "<strong>Membri:</strong> " + teamMembers.join(", ");
+      document.getElementById("team-context-desc").textContent = currentTeam.context;
+
+      renderStep1();
+      renderStep2();
+      renderStep3();
+      goToStep(1);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function editTeamMembers() {
+      document.getElementById("screen-workspace").classList.add("hidden");
+      document.getElementById("screen-members").classList.remove("hidden");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function resetToTeamSelect() {
+      document.getElementById("screen-workspace").classList.add("hidden");
+      document.getElementById("screen-members").classList.add("hidden");
+      document.getElementById("screen-select").classList.remove("hidden");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function goToStep(step) {
+      if (step > unlockedStep) return;
+      currentStep = step;
+
+      [1, 2, 3].forEach(s => {
+        const panel = document.getElementById("step-" + s);
+        const btn = document.getElementById("tab-btn-" + s);
+        if (s === step) {
+          panel.classList.remove("hidden");
+          btn.className = "py-2 px-2 rounded-lg text-xs font-bold border text-center transition bg-blue-800 text-white border-blue-800 shadow-sm cursor-pointer";
+        } else {
+          panel.classList.add("hidden");
+          if (s <= unlockedStep) {
+            btn.disabled = false;
+            btn.className = "py-2 px-2 rounded-lg text-xs font-bold border text-center transition bg-white text-slate-700 border-slate-300 cursor-pointer";
+          } else {
+            btn.disabled = true;
+            btn.className = "py-2 px-2 rounded-lg text-xs font-bold border text-center transition bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed";
+          }
+        }
+      });
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function renderStep1() {
+      const container = document.getElementById("step1-questions");
+      document.getElementById("step1-feedback").classList.add("hidden");
+
+      container.innerHTML = currentTeam.step1Cases.map((c, idx) => `
+        <div id="s1-card-${idx}" class="bg-white rounded-xl p-4 shadow-sm border border-slate-200">
+          <div class="text-xs font-bold text-slate-400 uppercase mb-1">Cazul Pacientului #${idx + 1}</div>
+          <p class="font-bold text-slate-800 text-sm mb-2.5">${c.feature}</p>
+          <div class="grid grid-cols-2 gap-2 text-xs mb-3">
+            <div class="bg-emerald-50 border border-emerald-200 p-2 rounded-lg">
+              <span class="block text-[10px] uppercase text-emerald-700 font-bold">Funcțional (Prezent)</span>
+              <span class="font-semibold text-slate-900">„${c.func}”</span>
+            </div>
+            <div class="bg-rose-50 border border-rose-200 p-2 rounded-lg">
+              <span class="block text-[10px] uppercase text-rose-700 font-bold">Disfuncțional (Absent)</span>
+              <span class="font-semibold text-slate-900">„${c.dysf}”</span>
+            </div>
+          </div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Încadrare conform Tabelului de evaluare Kano:</label>
+          <select id="s1-select-${idx}" class="w-full p-2.5 text-sm font-semibold bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600">
+            <option value="">-- Alegeți categoria (M, P, A, I, R, Q) --</option>
+            <option value="M">M - Must-Be (De bază)</option>
+            <option value="P">P - Performance (Performanță)</option>
+            <option value="A">A - Attractive (Atractivă / Entuziastă)</option>
+            <option value="I">I - Indifferent (Indiferentă)</option>
+            <option value="R">R - Reverse (Reversibilă)</option>
+            <option value="Q">Q - Questionable (Îndoielnică)</option>
+          </select>
+        </div>
+      `).join("");
+    }
+
+    function validateStep1() {
+      let correctCount = 0;
+      const total = currentTeam.step1Cases.length;
+
+      currentTeam.step1Cases.forEach((c, idx) => {
+        const sel = document.getElementById("s1-select-" + idx).value;
+        const card = document.getElementById("s1-card-" + idx);
+        if (sel === c.correct) {
+          correctCount++;
+          card.className = "bg-emerald-50/50 rounded-xl p-4 shadow-sm border-2 border-emerald-500";
+        } else {
+          card.className = "bg-rose-50/50 rounded-xl p-4 shadow-sm border-2 border-rose-500";
+        }
+      });
+
+      const fb = document.getElementById("step1-feedback");
+      fb.classList.remove("hidden");
+
+      if (correctCount === total) {
+        fb.className = "rounded-xl p-3.5 text-sm font-bold bg-emerald-100 text-emerald-900 border border-emerald-300";
+        fb.innerHTML = "✅ Excelent! Toate cele 4 fișe au fost încadrate corect. Trecem la Etapa 2!";
+        unlockedStep = Math.max(unlockedStep, 2);
+        setTimeout(() => goToStep(2), 700);
+      } else {
+        fb.className = "rounded-xl p-3.5 text-sm font-bold bg-rose-100 text-rose-900 border border-rose-300";
+        fb.innerHTML = "⚠️ Aveți " + correctCount + " din " + total + " răspunsuri corecte. Verificați cardurile marcate cu roșu folosind butonul „📖 Tabele & Formule” din dreapta-sus!";
+      }
+    }
+
+    function renderStep2() {
+      const container = document.getElementById("step2-items");
+      document.getElementById("step2-feedback").classList.add("hidden");
+
+      container.innerHTML = currentTeam.features.map(f => {
+        const m = computeKanoMetrics(f.counts);
+        const tableCounts = `
+          <div class="grid grid-cols-6 gap-1 text-center text-xs my-2 bg-slate-100 p-2 rounded-lg">
+            <div><span class="block text-[10px] font-bold text-blue-700">M</span><strong>${f.counts.M}</strong></div>
+            <div><span class="block text-[10px] font-bold text-emerald-700">P</span><strong>${f.counts.P}</strong></div>
+            <div><span class="block text-[10px] font-bold text-purple-700">A</span><strong>${f.counts.A}</strong></div>
+            <div><span class="block text-[10px] font-bold text-amber-700">I</span><strong>${f.counts.I}</strong></div>
+            <div><span class="block text-[10px] font-bold text-rose-700">R</span><strong>${f.counts.R}</strong></div>
+            <div><span class="block text-[10px] font-bold text-slate-500">Q</span><strong>${f.counts.Q}</strong></div>
+          </div>
+        `;
+
+        if (f.prefilled) {
+          return `
+            <div class="bg-white rounded-xl p-4 shadow-sm border border-slate-200">
+              <div class="flex items-center justify-between mb-1">
+                <span class="text-[11px] font-bold bg-slate-100 text-slate-600 px-2 py-0.5 rounded">Calculat automat</span>
+                <span class="text-xs font-bold text-slate-500">Cost: ${f.cost.toLocaleString('ro-RO')} €</span>
+              </div>
+              <p class="font-bold text-slate-900 text-sm">${f.name}</p>
+              ${tableCounts}
+              <div class="grid grid-cols-4 gap-2 text-center text-xs mt-2 pt-2 border-t border-slate-100">
+                <div class="bg-blue-50 p-1.5 rounded"><span class="block text-[10px] text-slate-500">Categorie</span><strong class="text-blue-900">${m.cat}</strong></div>
+                <div class="bg-blue-50 p-1.5 rounded"><span class="block text-[10px] text-slate-500">CS</span><strong class="text-blue-900">${m.cs.toFixed(2)}</strong></div>
+                <div class="bg-blue-50 p-1.5 rounded"><span class="block text-[10px] text-slate-500">CI</span><strong class="text-blue-900">${m.ci.toFixed(2)}</strong></div>
+                <div class="bg-blue-50 p-1.5 rounded"><span class="block text-[10px] text-slate-500">w<sub>i</sub></span><strong class="text-blue-900">${m.wi.toFixed(2)}</strong></div>
+              </div>
+            </div>
+          `;
+        } else {
+          return `
+            <div id="s2-card-${f.id}" class="bg-white rounded-xl p-4 shadow-sm border-2 border-amber-400">
+              <div class="flex items-center justify-between mb-1">
+                <span class="text-[11px] font-bold bg-amber-100 text-amber-900 px-2 py-0.5 rounded">✏️ De calculat de echipă</span>
+                <span class="text-xs font-bold text-slate-500">Cost: ${f.cost.toLocaleString('ro-RO')} €</span>
+              </div>
+              <p class="font-bold text-slate-900 text-sm">${f.name}</p>
+              ${tableCounts}
+              <div class="grid grid-cols-2 gap-2.5 mt-3 text-xs">
+                <div>
+                  <label class="block font-bold text-slate-700 mb-1">Tip nevoie predominantă:</label>
+                  <select id="s2-cat-${f.id}" class="w-full p-2 border border-slate-300 rounded-lg font-bold bg-slate-50">
+                    <option value="">Alege...</option>
+                    <option value="M">M (De bază)</option>
+                    <option value="P">P (Performanță)</option>
+                    <option value="A">A (Atractivă)</option>
+                    <option value="I">I (Indiferentă)</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block font-bold text-slate-700 mb-1">CS = (A+P)/(M+P+A+I):</label>
+                  <input id="s2-cs-${f.id}" type="text" inputmode="decimal" placeholder="ex: 0.70" class="w-full p-2 border border-slate-300 rounded-lg font-mono font-bold bg-slate-50">
+                </div>
+                <div>
+                  <label class="block font-bold text-slate-700 mb-1">CI = (M+P)/(M+P+A+I):</label>
+                  <input id="s2-ci-${f.id}" type="text" inputmode="decimal" placeholder="ex: 0.75" class="w-full p-2 border border-slate-300 rounded-lg font-mono font-bold bg-slate-50">
+                </div>
+                <div>
+                  <label class="block font-bold text-slate-700 mb-1">Greutate w<sub>i</sub> = max(CS,CI):</label>
+                  <input id="s2-wi-${f.id}" type="text" inputmode="decimal" placeholder="ex: 0.75" class="w-full p-2 border border-slate-300 rounded-lg font-mono font-bold bg-slate-50">
+                </div>
+              </div>
+            </div>
+          `;
+        }
+      }).join("");
+    }
+
+    function parseNum(val) {
+      if (!val) return NaN;
+      return parseFloat(val.toString().replace(",", ".").trim());
+    }
+
+    function validateStep2() {
+      const toCheck = currentTeam.features.filter(f => !f.prefilled);
+      let allCorrect = true;
+
+      toCheck.forEach(f => {
+        const m = computeKanoMetrics(f.counts);
+        const catVal = document.getElementById("s2-cat-" + f.id).value;
+        const csVal = parseNum(document.getElementById("s2-cs-" + f.id).value);
+        const ciVal = parseNum(document.getElementById("s2-ci-" + f.id).value);
+        const wiVal = parseNum(document.getElementById("s2-wi-" + f.id).value);
+
+        const okCat = catVal === m.cat;
+        const okCs = !isNaN(csVal) && Math.abs(csVal - m.cs) <= 0.02;
+        const okCi = !isNaN(ciVal) && Math.abs(ciVal - m.ci) <= 0.02;
+        const okWi = !isNaN(wiVal) && Math.abs(wiVal - m.wi) <= 0.02;
+
+        const card = document.getElementById("s2-card-" + f.id);
+        if (okCat && okCs && okCi && okWi) {
+          card.className = "bg-emerald-50/40 rounded-xl p-4 shadow-sm border-2 border-emerald-500";
+        } else {
+          allCorrect = false;
+          card.className = "bg-rose-50/40 rounded-xl p-4 shadow-sm border-2 border-rose-500";
+        }
+      });
+
+      const fb = document.getElementById("step2-feedback");
+      fb.classList.remove("hidden");
+
+      if (allCorrect) {
+        fb.className = "rounded-xl p-3.5 text-sm font-bold bg-emerald-100 text-emerald-900 border border-emerald-300";
+        fb.innerHTML = "✅ Calcule perfecte! Am generat diagrama de clasificare a atributelor pentru secția voastră.";
+        unlockedStep = Math.max(unlockedStep, 3);
+        setTimeout(() => goToStep(3), 700);
+      } else {
+        fb.className = "rounded-xl p-3.5 text-sm font-bold bg-rose-100 text-rose-900 border border-rose-300";
+        fb.innerHTML = "⚠️ Unul sau mai multe câmpuri sunt greșite. Verificați adunarea (A+P) pentru CS și (M+P) pentru CI, apoi împărțiți la 100!";
+      }
+    }
+
+    function renderStep3() {
+      const ptsContainer = document.getElementById("matrix-points");
+      ptsContainer.innerHTML = currentTeam.features.map((f, idx) => {
+        const m = computeKanoMetrics(f.counts);
+        const leftPct = Math.min(92, Math.max(8, m.ci * 100));
+        const bottomPct = Math.min(92, Math.max(8, m.cs * 100));
+        return `
+          <div style="left: ${leftPct}%; bottom: ${bottomPct}%;" class="absolute -translate-x-1/2 translate-y-1/2 flex flex-col items-center">
+            <div class="w-7 h-7 rounded-full bg-blue-900 text-white text-xs font-extrabold flex items-center justify-center shadow-md border-2 border-white">
+              #${idx + 1}
+            </div>
+            <span class="text-[9px] font-bold bg-white/90 px-1 rounded shadow text-slate-800 whitespace-nowrap">
+              (${m.ci.toFixed(2)}; ${m.cs.toFixed(2)})
+            </span>
+          </div>
+        `;
+      }).join("");
+
+      updateBudgetUI();
+      document.getElementById("final-report").classList.add("hidden");
+    }
+
+    function toggleBudgetItem(id) {
+      const item = currentTeam.features.find(f => f.id === id);
+      if (!item) return;
+
+      if (selectedBudgetIds.has(id)) {
+        selectedBudgetIds.delete(id);
+      } else {
+        const currentTotal = Array.from(selectedBudgetIds).reduce((sum, fid) => {
+          const found = currentTeam.features.find(x => x.id === fid);
+          return sum + (found ? found.cost : 0);
+        }, 0);
+
+        if (currentTotal + item.cost > 50000) {
+          alert("Buget depășit! Aveți maximum 50.000 € disponibili. Debifați o altă inițiativă înainte.");
+          return;
+        }
+        selectedBudgetIds.add(id);
+      }
+      updateBudgetUI();
+    }
+
+    function updateBudgetUI() {
+      const list = document.getElementById("budget-list");
+      let totalSpent = 0;
+
+      list.innerHTML = currentTeam.features.map(f => {
+        const m = computeKanoMetrics(f.counts);
+        const checked = selectedBudgetIds.has(f.id);
+        if (checked) totalSpent += f.cost;
+
+        const badgeColor = m.cat === "M" ? "bg-blue-100 text-blue-800" :
+                           m.cat === "P" ? "bg-emerald-100 text-emerald-800" :
+                           m.cat === "A" ? "bg-purple-100 text-purple-800" : "bg-amber-100 text-amber-800";
+
+        return `
+          <div onclick="toggleBudgetItem('${f.id}')" class="cursor-pointer rounded-xl p-3 border-2 transition flex items-start justify-between gap-2 ${checked ? 'bg-blue-50 border-blue-700' : 'bg-slate-50 border-slate-200 hover:border-slate-300'}">
+            <div class="flex items-start gap-2.5">
+              <input type="checkbox" ${checked ? 'checked' : ''} class="mt-1 w-4 h-4 pointer-events-none accent-blue-800">
+              <div>
+                <p class="font-bold text-slate-900 text-xs sm:text-sm">${f.name}</p>
+                <div class="flex flex-wrap gap-1.5 mt-1 text-[11px]">
+                  <span class="font-bold px-1.5 py-0.5 rounded ${badgeColor}">Cat: ${m.cat}</span>
+                  <span class="bg-white border px-1.5 py-0.5 rounded font-mono">CS: ${m.cs.toFixed(2)}</span>
+                  <span class="bg-white border px-1.5 py-0.5 rounded font-mono">CI: ${m.ci.toFixed(2)}</span>
+                  <span class="bg-white border px-1.5 py-0.5 rounded font-mono font-bold">w<sub>i</sub>: ${m.wi.toFixed(2)}</span>
+                </div>
+              </div>
+            </div>
+            <span class="text-xs font-extrabold text-slate-800 whitespace-nowrap bg-white px-2 py-1 rounded border">${f.cost.toLocaleString('ro-RO')} €</span>
+          </div>
+        `;
+      }).join("");
+
+      const counter = document.getElementById("budget-counter");
+      counter.textContent = totalSpent.toLocaleString('ro-RO') + " / 50.000 €";
+      counter.className = totalSpent === 50000
+        ? "text-xs font-extrabold px-2.5 py-1 rounded-full bg-blue-100 text-blue-900"
+        : "text-xs font-extrabold px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800";
+    }
+
+    function evaluateFinalDecision() {
+      if (selectedBudgetIds.size === 0) {
+        alert("Selectați cel puțin o inițiativă în care investiți bugetul!");
+        return;
+      }
+
+      const chosen = currentTeam.features.filter(f => selectedBudgetIds.has(f.id));
+      const unchosen = currentTeam.features.filter(f => !selectedBudgetIds.has(f.id));
+
+      const missedMustBe = unchosen.filter(f => computeKanoMetrics(f.counts).cat === "M");
+      const wastedIndifferent = chosen.filter(f => computeKanoMetrics(f.counts).cat === "I");
+
+      let score = 100;
+      let feedbackItems = [];
+
+      if (missedMustBe.length > 0) {
+        score -= 40 * missedMustBe.length;
+        missedMustBe.forEach(f => {
+          const m = computeKanoMetrics(f.counts);
+          feedbackItems.push("❌ <strong>Penalizare critică (-40p):</strong> Ați ignorat o nevoie <strong>De bază (M)</strong>: <em>„" + f.name + "”</em> (CI = " + m.ci.toFixed(2) + "). În modelul Kano, oricâte surprize plăcute (A) oferiți, dacă lipsesc elementele de bază (igienă, siguranță, empatie), pacienții vor fi profund nemulțumiți!");
+        });
+      } else {
+        feedbackItems.push("✅ <strong>Fundament asigurat:</strong> Ați finanțat toate nevoile <strong>De bază (M)</strong> ale secției, eliminând sursele majore de reclamații (CI ridicat).");
+      }
+
+      if (wastedIndifferent.length > 0) {
+        score -= 25 * wastedIndifferent.length;
+        wastedIndifferent.forEach(f => {
+          feedbackItems.push("⚠️ <strong>Risipă de buget (-25p):</strong> Ați cheltuit " + f.cost.toLocaleString('ro-RO') + " € pe o caracteristică <strong>Indiferentă (I)</strong>: <em>„" + f.name + "”</em>. Aceasta este clasica „Capcană a percepției” — conducerea crede că dă bine, dar pacienților nu le pasă.");
+        });
+      }
+
+      const chosenPerf = chosen.filter(f => computeKanoMetrics(f.counts).cat === "P");
+      if (chosenPerf.length > 0) {
+        feedbackItems.push("🚀 <strong>Creștere liniară a satisfacției:</strong> Ați inclus " + chosenPerf.length + " inițiativă(e) de <strong>Performanță (P)</strong> cu greutate absolută <em>w<sub>i</sub></em> mare.");
+      }
+
+      score = Math.max(10, score);
+      const justification = document.getElementById("team-justification").value.trim() || "(Fără argument scris)";
+      const totalSpent = chosen.reduce((s, c) => s + c.cost, 0);
+
+      lastEvaluation = {
+        score,
+        totalSpent,
+        chosen,
+        unchosen,
+        justification,
+        feedbackPlain: feedbackItems.map(item => item.replace(/<[^>]+>/g, ""))
+      };
+
+      const reportBox = document.getElementById("final-report");
+      reportBox.classList.remove("hidden");
+      reportBox.className = score >= 85
+        ? "rounded-2xl p-5 shadow-md border-2 bg-emerald-50 border-emerald-500 fade-in"
+        : score >= 60
+        ? "rounded-2xl p-5 shadow-md border-2 bg-amber-50 border-amber-500 fade-in"
+        : "rounded-2xl p-5 shadow-md border-2 bg-rose-50 border-rose-500 fade-in";
+
+      reportBox.innerHTML = `
+        <div class="flex items-center justify-between border-b border-slate-300 pb-3 mb-3">
+          <div>
+            <span class="text-xs font-bold uppercase text-slate-600">${currentTeam.badge}</span>
+            <h4 class="text-lg font-extrabold text-slate-900">Raportul Decizional KANO</h4>
+          </div>
+          <div class="text-right">
+            <span class="text-xs block text-slate-600">Scor Strategie</span>
+            <span class="text-2xl font-black text-blue-900">${score} / 100</span>
+          </div>
+        </div>
+
+        <div class="bg-white/80 p-2.5 rounded-lg border border-slate-200 text-xs mb-3">
+          <strong>Echipa (${teamMembers.length} studenți):</strong> ${teamMembers.join(", ")}
+        </div>
+
+        <div class="space-y-2 text-xs text-slate-800 mb-4">
+          ${feedbackItems.map(item => `<p class="leading-relaxed">${item}</p>`).join("")}
+        </div>
+
+        <div class="bg-white p-3 rounded-xl border border-slate-200 text-xs mb-4">
+          <p class="font-bold text-slate-700 mb-1">Inițiative finanțate (${totalSpent.toLocaleString('ro-RO')} / 50.000 €):</p>
+          <ul class="list-disc pl-4 space-y-0.5 text-slate-800 mb-2">
+            ${chosen.map(c => `<li><strong>${c.name}</strong> (${c.cost.toLocaleString('ro-RO')} €)</li>`).join("")}
+          </ul>
+          <p class="font-bold text-slate-700 mb-0.5">Argumentul echipei:</p>
+          <p class="italic text-slate-600">„${justification}”</p>
+        </div>
+
+        <button type="button" onclick="downloadPDFReport()" class="w-full bg-blue-900 hover:bg-blue-800 text-white font-bold py-3.5 px-4 rounded-xl shadow-md flex items-center justify-center gap-2 transition cursor-pointer">
+          <span>📄</span> Descarcă Raportul PDF (pentru încărcare pe platformă)
+        </button>
+      `;
+
+      reportBox.scrollIntoView({ behavior: "smooth" });
+    }
+
+    // Înlocuiește diacriticele pentru compatibilitate 100% cu fontul standard Helvetica din jsPDF
+    function cleanRo(str) {
+      if (!str) return "";
+      return str
+        .replace(/ă/g, "a").replace(/Ă/g, "A")
+        .replace(/â/g, "a").replace(/Â/g, "A")
+        .replace(/î/g, "i").replace(/Î/g, "I")
+        .replace(/ș/g, "s").replace(/Ș/g, "S").replace(/ş/g, "s").replace(/Ş/g, "S")
+        .replace(/ț/g, "t").replace(/Ț/g, "T").replace(/ţ/g, "t").replace(/Ţ/g, "T")
+        .replace(/„/g, '"').replace(/”/g, '"').replace(/—/g, "-").replace(/€/g, "EUR");
+    }
+
+    function downloadPDFReport() {
+      if (!lastEvaluation || !currentTeam) return;
+
+      if (!window.jspdf || !window.jspdf.jsPDF) {
+        window.print();
+        return;
+      }
+
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ orientation: "p", unit: "mm", format: "a4" });
+      const now = new Date().toLocaleString("ro-RO");
+      let y = 15;
+
+      // Header albastru
+      doc.setFillColor(30, 58, 138);
+      doc.rect(0, 0, 210, 30, "F");
+      doc.setTextColor(255, 255, 255);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(14);
+      doc.text(cleanRo("RAPORT STUDIU DE CAZ: MODELUL KANO"), 14, 13);
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(10);
+      doc.text(cleanRo("Masterat Anul I - Managementul Calitatii in Sistemul Sanitar"), 14, 20);
+      doc.setFontSize(8);
+      doc.text(cleanRo("Generat la: " + now), 14, 26);
+
+      y = 38;
+      doc.setTextColor(20, 20, 20);
+
+      // Caseta Echipa & Scor
+      doc.setFillColor(241, 245, 249);
+      doc.rect(14, y, 182, 24, "F");
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(11);
+      doc.text(cleanRo("Sectia aleasa: " + currentTeam.name + " (" + currentTeam.badge + ")"), 18, y + 7);
+      doc.setFontSize(10);
+      doc.text(cleanRo("Scor Strategie: " + lastEvaluation.score + " / 100 puncte"), 145, y + 7);
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(9.5);
+      const membersLine = cleanRo("Membrii echipei: " + teamMembers.join(", "));
+      const splitMembers = doc.splitTextToSize(membersLine, 174);
+      doc.text(splitMembers, 18, y + 14);
+
+      y += 32;
+
+      // ETAPA 1
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(11);
+      doc.setTextColor(30, 58, 138);
+      doc.text(cleanRo("1. Etapa 1 - Incadrarea raspunsurilor in Tabelul de evaluare Kano"), 14, y);
+      y += 6;
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(9);
+      doc.setTextColor(30, 30, 30);
+      currentTeam.step1Cases.forEach((c, idx) => {
+        const line = cleanRo((idx + 1) + ". " + c.feature + " [Functional: " + c.func + " | Disfunctional: " + c.dysf + "]  ==>  Categoria: " + c.correct);
+        const wrapped = doc.splitTextToSize(line, 180);
+        doc.text(wrapped, 16, y);
+        y += wrapped.length * 4.5 + 1.5;
+      });
+
+      y += 4;
+
+      // ETAPA 2
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(11);
+      doc.setTextColor(30, 58, 138);
+      doc.text(cleanRo("2. Etapa 2 - Calculul Coeficientilor CS, CI si Greutatea Absoluta (wi)"), 14, y);
+      y += 6;
+
+      // Tabel Header
+      doc.setFillColor(226, 232, 240);
+      doc.rect(14, y - 4, 182, 7, "F");
+      doc.setFontSize(8.5);
+      doc.setTextColor(0, 0, 0);
+      doc.text(cleanRo("Initiativa analizata (100 pacienti)"), 16, y);
+      doc.text("Cat.", 126, y);
+      doc.text("CS", 140, y);
+      doc.text("CI", 154, y);
+      doc.text("wi", 168, y);
+      doc.text("Cost", 180, y);
+      y += 6;
+
+      doc.setFont("helvetica", "normal");
+      currentTeam.features.forEach(f => {
+        const m = computeKanoMetrics(f.counts);
+        const shortName = cleanRo(f.name);
+        const wrappedName = doc.splitTextToSize(shortName, 106);
+        doc.text(wrappedName, 16, y);
+        doc.text(m.cat, 128, y);
+        doc.text(m.cs.toFixed(2), 139, y);
+        doc.text(m.ci.toFixed(2), 153, y);
+        doc.text(m.wi.toFixed(2), 167, y);
+        doc.text(f.cost.toLocaleString("ro-RO") + " EUR", 178, y);
+        y += Math.max(wrappedName.length * 4.2, 5.5) + 1.5;
+      });
+
+      y += 4;
+
+      // ETAPA 3
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(11);
+      doc.setTextColor(30, 58, 138);
+      doc.text(cleanRo("3. Etapa 3 - Decizia de Alocare a Bugetului (" + lastEvaluation.totalSpent.toLocaleString("ro-RO") + " / 50.000 EUR)"), 14, y);
+      y += 6;
+
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(9.5);
+      doc.setTextColor(20, 83, 45);
+      doc.text(cleanRo("Initiative FINANTATE de echipa:"), 16, y);
+      y += 5;
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(9);
+      doc.setTextColor(30, 30, 30);
+      lastEvaluation.chosen.forEach(c => {
+        const m = computeKanoMetrics(c.counts);
+        const txt = cleanRo("[DA] " + c.name + " - Categorie: " + m.cat + " | wi: " + m.wi.toFixed(2) + " | Cost: " + c.cost.toLocaleString("ro-RO") + " EUR");
+        const wrapped = doc.splitTextToSize(txt, 178);
+        doc.text(wrapped, 18, y);
+        y += wrapped.length * 4.5 + 1;
+      });
+
+      y += 2;
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(9.5);
+      doc.setTextColor(153, 27, 27);
+      doc.text(cleanRo("Initiative NEFINANTATE (taiate de pe lista):"), 16, y);
+      y += 5;
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(9);
+      doc.setTextColor(80, 80, 80);
+      lastEvaluation.unchosen.forEach(c => {
+        const m = computeKanoMetrics(c.counts);
+        const txt = cleanRo("[NU] " + c.name + " - Categorie: " + m.cat + " | wi: " + m.wi.toFixed(2) + " | Cost: " + c.cost.toLocaleString("ro-RO") + " EUR");
+        const wrapped = doc.splitTextToSize(txt, 178);
+        doc.text(wrapped, 18, y);
+        y += wrapped.length * 4.5 + 1;
+      });
+
+      y += 4;
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(10);
+      doc.setTextColor(30, 58, 138);
+      doc.text(cleanRo("4. Argumentul / Justificarea Echipei:"), 14, y);
+      y += 5;
+
+      doc.setFont("helvetica", "italic");
+      doc.setFontSize(9.5);
+      doc.setTextColor(30, 30, 30);
+      const justWrapped = doc.splitTextToSize(cleanRo('"' + lastEvaluation.justification + '"'), 180);
+      doc.text(justWrapped, 16, y);
+      y += justWrapped.length * 4.5 + 4;
+
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(10);
+      doc.setTextColor(30, 58, 138);
+      doc.text(cleanRo("5. Evaluarea Automata a Simulatorului:"), 14, y);
+      y += 5;
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(8.5);
+      doc.setTextColor(40, 40, 40);
+      lastEvaluation.feedbackPlain.forEach(fb => {
+        const fbWrapped = doc.splitTextToSize(cleanRo("- " + fb), 178);
+        doc.text(fbWrapped, 16, y);
+        y += fbWrapped.length * 4.2 + 1.5;
+      });
+
+      const fileName = "Raport_KANO_Echipa_" + currentTeam.id + ".pdf";
+      doc.save(fileName);
+    }
+
+    function toggleCheatSheet() {
+      const modal = document.getElementById("modal-cheatsheet");
+      modal.classList.toggle("hidden");
+    }
+  </script>
+</body>
+</html>
